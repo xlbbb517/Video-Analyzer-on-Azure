@@ -1,3 +1,5 @@
+The current repo is divided into two parts: UI and API. Please enter the corresponding folders for more details.
+
 # Video Analyzer on Azure
 
 A comprehensive AI-powered video analysis solution on Azure. This application enables intelligent video content analysis through frame extraction, audio transcription, and multimodal AI processing.
