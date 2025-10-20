@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Video Analyzer On Azure</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+    <link href="https://fonts.googleapis.com/css2?family=Segoe+UI:wght@400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="app-container">
+        <!-- Settings Panel -->
+        <div class="settings-panel" id="settingsPanel">
+            <div class="settings-header">
+                <h2>
+                    Configuration
+                    <span class="config-help-icon" onclick="showConfigHelp()" title="Configuration Help">
+                        <svg fill="currentColor" aria-hidden="true" width="20" height="20" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M10 2a8 8 0 1 1 0 16 8 8 0 0 1 0-16Zm0 1a7 7 0 1 0 0 14 7 7 0 0 0 0-14Zm0 10.5a.75.75 0 1 1 0 1.5.75.75 0 0 1 0-1.5Zm0-8a2.5 2.5 0 0 1 1.65 4.38l-.15.12-.22.17-.09.07-.16.15c-.33.36-.53.85-.53 1.61a.5.5 0 0 1-1 0 3.2 3.2 0 0 1 1.16-2.62l.25-.19.12-.1A1.5 1.5 0 0 0 10 6.5c-.83 0-1.5.67-1.5 1.5a.5.5 0 0 1-1 0A2.5 2.5 0 0 1 10 5.5Z" fill="currentColor"></path>
+                        </svg>
+                    </span>
+                </h2>
+                <div class="settings-actions">
+                    <button class="export-btn" onclick="exportSettings()" title="Export Settings">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                            <polyline points="17,8 12,3 7,8"/>
+                            <line x1="12" y1="3" x2="12" y2="15"/>
+                        </svg>
+                    </button>
+                    <input type="file" id="importFile" accept=".json" style="display: none;" onchange="importSettings(event)">
+                    <button class="import-btn" onclick="document.getElementById('importFile').click()" title="Import Settings">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                            <polyline points="7,10 12,15 17,10"/>
+                            <line x1="12" y1="15" x2="12" y2="3"/>
+                        </svg>
+                    </button>
+                </div>
+            </div>
+            
+            <div class="settings-content">
+                <!-- Azure OpenAI Configuration -->
+                <div class="settings-section">
+                    <h3>Azure OpenAI Configuration</h3>
+                    <div class="form-group">
+                        <label for="azureEndpoint">Azure Endpoint *</label>
+                        <input type="url" id="azureEndpoint" placeholder="Your Azure OpenAI API Endpoint" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="azureApiKey">API Key *</label>
+                        <input type="password" id="azureApiKey" placeholder="Your Azure OpenAI API Key" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="llmModel">LLM Model Name</label>
+                        <input type="text" id="llmModel" placeholder="gpt-4o-mini" value="gpt-4o-mini">
+                    </div>
+                </div>
+
+                <!-- System Prompt -->
+                <div class="settings-section">
+                    <h3>System Prompt</h3>
+                    <div class="form-group">
+                        <label for="systemPrompt">System Prompt (Optional)</label>
+                        <textarea id="systemPrompt" rows="3" placeholder="Enter system prompt to guide AI behavior..."></textarea>
+                    </div>
+                </div>
+
+                <!-- Audio Analysis Configuration -->
+                <div class="settings-section">
+                    <h3>Audio Analysis</h3>
+                    <div class="form-group">
+                        <label class="checkbox-label">
+                            <input type="checkbox" id="enableAudioAnalysis">
+                            Enable Audio Analysis
+                        </label>
+                    </div>
+                    
+                    <div class="audio-config" id="audioConfig" style="display: none;">
+                        <div class="form-group">
+                            <label for="audioEndpoint">Audio Endpoint (Optional)</label>
+                            <input type="url" id="audioEndpoint" placeholder="Leave empty to use main endpoint">
+                        </div>
+                        <div class="form-group">
+                            <label for="audioApiKey">Audio API Key (Optional)</label>
+                            <input type="password" id="audioApiKey" placeholder="Leave empty to use main API key">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="audioMainModel">Main Audio Model</label>
+                            <input type="text" id="audioMainModel" placeholder="gpt-4o-audio-preview" value="gpt-4o-audio-preview">
+                        </div>
+                        
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label class="checkbox-label">
+                                    <input type="checkbox" id="enableV2Audio">
+                                    Enable V2
+                                </label>
+                                <input type="text" id="audioV2Model" placeholder="whisper" value="whisper" class="model-input">
+                            </div>
+                            <div class="form-group">
+                                <label class="checkbox-label">
+                                    <input type="checkbox" id="enableV3Audio">
+                                    Enable V3
+                                </label>
+                                <input type="text" id="audioV3Model" placeholder="gpt-4o-mini-transcribe" value="gpt-4o-mini-transcribe" class="model-input">
+                            </div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="audioPrompt">Audio Analysis Prompt</label>
+                            <textarea id="audioPrompt" rows="3" placeholder="Please describe what happens in this audio...">Please describe what happens in this audio. If there are conversations, provide transcriptions. Describe any sounds you hear, including background noises, music, sound effects, environmental sounds, etc. Please provide a comprehensive analysis in English.</textarea>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Frame Extraction Settings -->
+                <div class="settings-section">
+                    <h3>Frame Extraction</h3>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="maxFrames">Max Frames</label>
+                            <input type="number" id="maxFrames" placeholder="12" min="1" max="50" value="12">
+                        </div>
+                        <div class="form-group">
+                            <label for="minTimeGap">Min Time Gap (s)</label>
+                            <input type="number" id="minTimeGap" placeholder="0.8" step="0.1" min="0" value="0.8">
+                        </div>
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="frameGap">Frame Gap</label>
+                            <input type="number" id="frameGap" placeholder="5" min="1" value="5">
+                        </div>
+                        <div class="form-group">
+                            <label for="minFramesAfterDedup">Min Frames After Dedup</label>
+                            <input type="number" id="minFramesAfterDedup" placeholder="3" min="1" value="3">
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="checkbox-label">
+                            <input type="checkbox" id="enableImageEnhancement">
+                            Enable Image Enhancement
+                        </label>
+                    </div>
+                    <div class="form-group">
+                        <label class="checkbox-label">
+                            <input type="checkbox" id="enableDeduplication" checked>
+                            Enable Deduplication
+                        </label>
+                    </div>
+                </div>
+
+                <!-- Advanced Settings -->
+                <div class="settings-section collapsible">
+                    <h3 onclick="toggleSection(this)">
+                        Advanced Settings
+                        <svg class="collapse-icon" width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
+                            <path d="M8 12l-4-4h8l-4 4z"/>
+                        </svg>
+                    </h3>
+                    <div class="section-content" style="display: none;">
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="motionWeight">Motion Weight</label>
+                                <input type="number" id="motionWeight" placeholder="3.0" step="0.1" value="3.0">
+                            </div>
+                            <div class="form-group">
+                                <label for="sceneWeight">Scene Weight</label>
+                                <input type="number" id="sceneWeight" placeholder="1.5" step="0.1" value="1.5">
+                            </div>
+                        </div>
+                        
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="colorWeight">Color Weight</label>
+                                <input type="number" id="colorWeight" placeholder="0.5" step="0.1" value="0.5">
+                            </div>
+                            <div class="form-group">
+                                <label for="edgeWeight">Edge Weight</label>
+                                <input type="number" id="edgeWeight" placeholder="2.0" step="0.1" value="2.0">
+                            </div>
+                        </div>
+                        
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="contentFrameBar">Content Frame Bar</label>
+                                <input type="number" id="contentFrameBar" placeholder="0.5" step="0.1" min="0" max="1" value="0.5">
+                            </div>
+                            <div class="form-group">
+                                <label for="similarityThreshold">Similarity Threshold</label>
+                                <input type="number" id="similarityThreshold" placeholder="0.95" step="0.01" min="0" max="1" value="0.95">
+                            </div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="maximumDimension">Maximum Dimension</label>
+                            <input type="number" id="maximumDimension" placeholder="480" min="100" value="480">
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Resizer Handle -->
+            <div class="settings-resizer" id="settingsResizer"></div>
+        </div>
+
+        <!-- Chat Container -->
+        <div class="chat-container" id="chatContainer">
+            <!-- Header -->
+            <div class="chat-header">
+                <div class="header-left">
+                    <h1>Video Analyzer On Azure</h1>
+                    <div class="copyright-info"><p>© GCR DN Tech Team | Contact: t-yuningzhu@microsoft.com, danlinzhu@microsoft.com</div>
+                </div>
+                <div class="header-right">
+                    <button class="clear-chat-btn" onclick="clearChat()" title="Clear Chat">
+                        <svg fill="currentColor" aria-hidden="true" width="48" height="48" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M17.91 2.18c.2.2.2.51 0 .7l-5.32 5.33a4.5 4.5 0 0 1-.34 6l-.66.66-2.09 3.48a.5.5 0 0 1-.78.1l-7.07-7.08a.5.5 0 0 1 .1-.78L5.22 8.5l.66-.66a4.5 4.5 0 0 1 5.99-.34l5.32-5.32c.2-.2.51-.2.71 0ZM6.24 8.9l4.95 4.95.36-.35A3.5 3.5 0 1 0 6.6 8.55l-.36.35Zm-.78.63L2.8 11.12l6.16 6.17 1.6-2.66-5.11-5.1Z" fill="currentColor"/>
+                        </svg>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Messages Area -->
+            <div class="chat-messages" id="chatMessages">
+                <div class="welcome-message">
+                    <div class="welcome-icon">
+                        <img src="{{ url_for('static', filename='images/Video.svg') }}" alt="Welcome" width="200" height="60">
+                    </div>
+                    <h3>Welcome to Video Analyzer On Azure</h3>
+                    <p>Upload a video and ask questions about its content. Configure your Azure OpenAI settings in the left panel to get started.</p>
+                </div>
+            </div>
+
+            <!-- Input Area -->
+            <div class="chat-input-area">
+                <div class="message-input-container">
+                    <input type="file" id="videoInput" accept="video/*" style="display: none;">
+                    <div class="input-wrapper">
+                        <textarea id="messageInput" placeholder="Describe what you'd like help with" disabled></textarea>
+                        <div class="input-actions">
+                            <button class="video-upload-btn" onclick="document.getElementById('videoInput').click()" title="Upload Video">
+                                <svg width="24" height="24" viewBox="0 0 20 20" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="m4.83 10.48 5.65-5.65a3 3 0 0 1 4.25 4.24L8 15.8a1.5 1.5 0 0 1-2.12-2.12l6-6.01a.5.5 0 1 0-.7-.71l-6 6.01a2.5 2.5 0 0 0 3.53 3.54l6.71-6.72a4 4 0 1 0-5.65-5.66L4.12 9.78a.5.5 0 0 0 .7.7Z" fill="currentColor"/>
+                                </svg>
+                            </button>
+                            <div class="button-separator"></div>
+                            <button id="sendButton" onclick="sendMessage()" disabled>
+                                <svg width="24" height="24" viewBox="0 0 20 20" fill="currentColor">
+                                    <path d="M2.18 2.11a.5.5 0 0 1 .54-.06l15 7.5a.5.5 0 0 1 0 .9l-15 7.5a.5.5 0 0 1-.7-.58L3.98 10 2.02 2.63a.5.5 0 0 1 .16-.52Zm2.7 8.39-1.61 6.06L16.38 10 3.27 3.44 4.88 9.5h6.62a.5.5 0 1 1 0 1H4.88Z" fill="currentColor"/>
+                                </svg>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="configHelpModal" class="modal" style="display: none;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Configuration Help</h2>
+                <span class="close-modal" onclick="closeConfigHelp()">&times;</span>
+            </div>
+            <div class="modal-body">
+                <h3>Frame Extraction</h3>
+                <ul>
+                    <li><strong>Max Frames:</strong> Maximum number of frames to extract from the video (1-50)</li>
+                    <li><strong>Min Time Gap:</strong> Minimum time interval between extracted frames in seconds</li>
+                    <li><strong>Frame Gap:</strong> Number of frames to skip between samples</li>
+                    <li><strong>Min Frames After Dedup:</strong> Minimum frames to keep after removing duplicates</li>
+                </ul>
+                
+                <h3>Advanced Settings</h3>
+                <ul>
+                    <li><strong>Motion Weight:</strong> Importance of motion detection in frame selection (0-10)</li>
+                    <li><strong>Scene Weight:</strong> Importance of scene changes in frame selection (0-10)</li>
+                    <li><strong>Color Weight:</strong> Importance of color distribution in frame selection (0-10)</li>
+                    <li><strong>Edge Weight:</strong> Importance of edge density in frame selection (0-10)</li>
+                    <li><strong>Content Frame Bar:</strong> Threshold for content frame detection (0-1)</li>
+                    <li><strong>Similarity Threshold:</strong> How similar frames must be to be considered duplicates (0-1)</li>
+                    <li><strong>Maximum Dimension:</strong> Maximum pixel dimension for processing frames</li>
+                </ul>
+                
+                <h3>Audio Analysis</h3>
+                <ul>
+                    <li><strong>Enable Audio Analysis:</strong> Extract and analyze audio content from videos</li>
+                    <li><strong>Audio Models:</strong> Different models for audio transcription and analysis</li>
+                    <li><strong>Audio Prompt:</strong> Instructions for the AI on how to analyze the audio</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <script src="{{ url_for('static', filename='js/app.js') }}"></script>
+    <script>
+        function toggleSection(header) {
+            const content = header.nextElementSibling;
+            const icon = header.querySelector('.collapse-icon');
+            
+            if (content.style.display === 'none') {
+                content.style.display = 'block';
+                icon.style.transform = 'rotate(180deg)';
+            } else {
+                content.style.display = 'none';
+                icon.style.transform = 'rotate(0deg)';
+            }
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,15 @@
+requests
+openai
+opencv-python
+numpy
+Pillow
+scikit-image
+flask
+werkzeug
+soundfile
+librosa
+dotenv 
+azure-storage-blob 
+fastapi 
+pydantic 
+uvicorn
