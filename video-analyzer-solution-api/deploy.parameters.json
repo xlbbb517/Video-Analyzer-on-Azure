@@ -1,0 +1,33 @@
+{
+  "LOCATION": "eastus2",
+  "RESOURCE_GROUP": "video_analyzer_api_RG",
+  "RESOURCE_BASE_NAME": "video-analyzer-api",
+  
+  "AZURE_OPENAI_DEPLOYMENT_NAME": "gpt-4.1-mini",
+  "AZURE_OPENAI_API_VERSION": "2024-02-15-preview",
+  
+  "AUDIO_DEPLOYMENT_NAME": "gpt-4o-audio-preview",
+  "AUDIO_DEPLOYMENT_NAME_V2": "whisper", 
+  "AUDIO_DEPLOYMENT_NAME_V3": "gpt-4o-mini-transcribe",
+  "AUDIO_API_VERSION": "2025-01-01-preview",
+  
+  "CHAT_MODEL_NAME": "gpt-4.1-mini",
+  "CHAT_MODEL_VERSION": "2025-04-14",
+  "CHAT_SKU_CAPACITY": "250",
+  "CHAT_SKU_NAME": "GlobalStandard",
+  
+  "AUDIO_MODEL_NAME": "gpt-4o-audio-preview",
+  "AUDIO_MODEL_VERSION": "2024-12-17",
+  "AUDIO_SKU_CAPACITY": "250",
+  "AUDIO_SKU_NAME": "GlobalStandard",
+  
+  "AUDIO_V2_MODEL_NAME": "gpt-4o-transcribe",
+  "AUDIO_V2_MODEL_VERSION": "2025-03-20",
+  "AUDIO_V2_SKU_CAPACITY": "100",
+  "AUDIO_V2_SKU_NAME": "GlobalStandard",
+  
+  "AUDIO_V3_MODEL_NAME": "gpt-4o-mini-transcribe",
+  "AUDIO_V3_MODEL_VERSION": "2025-03-20",
+  "AUDIO_V3_SKU_CAPACITY": "100",
+  "AUDIO_V3_SKU_NAME": "GlobalStandard"
+}

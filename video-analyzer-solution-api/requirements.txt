@@ -1,0 +1,9 @@
+dotenv 
+openai 
+scikit-image 
+opencv-python 
+azure-storage-blob 
+fastapi 
+pydantic 
+uvicorn
+python-multipart
